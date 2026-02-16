@@ -331,6 +331,24 @@ func CreateProvider(cfg *config.Config) (LLMProvider, error) {
 				apiBase = "localhost:4321"
 			}
 			return NewGitHubCopilotProvider(apiBase, cfg.Providers.GitHubCopilot.ConnectMode, model)
+		case "ollama":
+			apiKey = cfg.Providers.Ollama.APIKey
+			apiBase = cfg.Providers.Ollama.APIBase
+			proxy = cfg.Providers.Ollama.Proxy
+			if apiBase == "" {
+				apiBase = "http://localhost:11434/v1"
+			} else {
+				if !strings.Contains(apiBase, "://") {
+					apiBase = "http://" + apiBase
+				}
+				// Append /v1 if missing, as Ollama's OpenAI compatible endpoint requires it
+				if !strings.HasSuffix(apiBase, "/v1") {
+					apiBase = strings.TrimRight(apiBase, "/") + "/v1"
+				}
+			}
+			if apiKey == "" {
+				apiKey = "ollama"
+			}
 
 		}
 
